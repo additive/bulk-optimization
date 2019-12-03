@@ -1,0 +1,38 @@
+{
+  // GENERAL
+  "files.eol": "\n",
+  "editor.formatOnSave": true,
+  "files.trimTrailingWhitespace": true,
+  "cSpell.ignorePaths": [
+    ".git",
+    ".vscode",
+  ],
+  "editor.rulers": [
+    90
+  ],
+  // PYTHON
+  "python.pythonPath": "${workspaceRoot}/venv/bin/python",
+  "python.linting.flake8Path": "${workspaceRoot}/venv/bin/flake8",
+  "python.formatting.blackPath": "${workspaceRoot}/venv/bin/black",
+  "python.analysis.cacheFolderPath": "${workspaceRoot}/.cache",
+  "python.envFile": "${workspaceRoot}/.vscode/python.env",
+  "python.linting.enabled": true,
+  "python.testing.cwd": "app",
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": [
+    "--max-line-length=90",
+    "--ignore=E722,E501,W503"
+  ],
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": [
+    "--line-length=90"
+  ],
+  // WORDS
+  "cSpell.words": [
+    "asyncio",
+    "ffmpeg",
+    "virtualenv",
+    "webm"
+  ],
+}
