@@ -12,7 +12,9 @@ class GIF(Generator):
         self.start("Starting compression...")
 
         output = self.rename_extension(self.output_file, "gif")
-        output.touch()  # create an empty file
+        if output.exists() and self.skip_existing:
+            self.warn("Already exists, skipping...")
+            return output
 
         gifsicle(
             str(self.input_file),

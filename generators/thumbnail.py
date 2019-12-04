@@ -14,7 +14,9 @@ class Thumbnail(Generator):
 
         output = self.rename_extension(self.output_file, "jpg")
         output = self.rename_file(output, output.stem + "-thumb")
-        output.touch()  # create an empty file
+        if output.exists() and self.skip_existing:
+            self.warn("Already exists, skipping...")
+            return output
 
         instance = ffmpeg.input(self.input_file)
         video = instance.video
@@ -30,7 +32,7 @@ class Thumbnail(Generator):
 
         ffmpeg.run(stream, overwrite_output=True)
 
-        generator = JPG(self.group, self.type, output, output)
+        generator = JPG(self.group, self.type, output, output, False)
         output = await generator.run()
 
         self.done()

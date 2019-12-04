@@ -12,20 +12,25 @@ class JPG(Generator):
         self.start("Starting compression...")
 
         output = self.rename_extension(self.output_file, "jpg")
-        output.touch()  # create an empty file
+        if output.exists() and self.skip_existing:
+            self.warn("Already exists, skipping...")
+            return output
 
         with Image.open(self.input_file) as img:
             if img.mode in ("RGBA", "LA"):
                 background = Image.new(img.mode[:-1], img.size, "#ffffff")
                 background.paste(img, img.split()[-1])
                 img = background
-            else:
-                img.convert("RGB")
-            img.thumbnail((1600, 900), Image.LANCZOS)
-            img.compression = "jpeg2000"
-            img.compression_quality = 85
-            img.type = "optimize"
-            img.save(str(output), "JPEG")
+            img = img.convert("RGB")
+            img.thumbnail((1920, 1080), Image.LANCZOS)
+            img.save(
+                str(output),
+                "JPEG",
+                jfif_unit=1,
+                quality=85,
+                optimize=True,
+                progressive=True,
+            )
             img.close()
 
         self.done()

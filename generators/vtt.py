@@ -22,7 +22,9 @@ class VTT(Generator):
 
         output = self.rename_extension(self.output_file, "jpg")
         output = self.rename_file(output, output.stem + "-vtt")
-        output.touch()  # create an empty file
+        if output.exists() and self.skip_existing:
+            self.warn("Already exists, skipping...")
+            return output
 
         self.size = (160, 90)
         self.columns = 7

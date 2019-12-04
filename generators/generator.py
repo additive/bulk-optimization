@@ -9,16 +9,18 @@ from utils.display import Write, Box
 
 
 class Generator:
-    group = None
+    group = "generator"
     type = None
     input_file = None
     output_file = None
+    skip_existing = True
 
-    def __init__(self, group, type, input_file, output_file):
+    def __init__(self, group, type, input_file, output_file, skip_existing):
         self.group = group
         self.type = type
         self.input_file = Path(input_file)
         self.output_file = Path(output_file)
+        self.skip_existing = skip_existing
 
     def start(self, *text):
         group_label = Box.new(fg.li_black, self.group)
@@ -37,7 +39,14 @@ class Generator:
     def error(self, *text):
         group_label = Box.new(fg.li_black, self.group)
         type_label = " " + Box.new(fg.li_black, self.type) if self.type else ""
-        Write.fail(
+        Write.error(
+            group_label + type_label, *text,
+        )
+
+    def warn(self, *text):
+        group_label = Box.new(fg.li_black, self.group)
+        type_label = " " + Box.new(fg.li_black, self.type) if self.type else ""
+        Write.warn(
             group_label + type_label, *text,
         )
 

@@ -1,4 +1,4 @@
-*.mp4
+tests/
 
 # Created by https://www.gitignore.io/api/git,linux,macos,python,windows,virtualenv
 # Edit at https://www.gitignore.io/?templates=git,linux,macos,python,windows,virtualenv

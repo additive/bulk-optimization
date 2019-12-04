@@ -12,14 +12,17 @@ class WEBP(Generator):
         self.start("Starting compression...")
 
         output = self.rename_extension(self.output_file, "webp")
-        output.touch()  # create an empty file
+        if output.exists() and self.skip_existing:
+            self.warn("Already exists, skipping...")
+            return output
 
         with Image.open(self.input_file) as img:
-            img.convert("RGB")
-            img.thumbnail((1600, 900), Image.LANCZOS)
-            img.compression_quality = 85
-            img.type = "optimize"
-            img.save(str(output), "WEBP")
+            if img.mode in ("RGBA", "LA"):
+                img = img.convert("RGBA")
+            else:
+                img = img.convert("RGB")
+            img.thumbnail((1920, 1080), Image.LANCZOS)
+            img.save(str(output), "WEBP", lossless=True, quality=85, method=2)
             img.close()
 
         self.done()

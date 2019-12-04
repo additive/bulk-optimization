@@ -13,7 +13,7 @@ class File(Generator):
     async def run(self):
         self.start("Moving file...")
 
-        if self.output_file.exists():
+        if self.output_file.exists() and self.skip_existing:
             self.info("Already exists, skipping...")
             return self.output_file
 

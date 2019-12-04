@@ -14,7 +14,9 @@ class WEBM(Generator):
         self.start("Starting compression...")
 
         output = self.rename_extension(self.output_file, "webm")
-        output.touch()  # create an empty file
+        if output.exists() and self.skip_existing:
+            self.warn("Already exists, skipping...")
+            return output
 
         total_duration = float(ffmpeg.probe(self.input_file)["format"]["duration"])
         with show_progress(total_duration) as socket_filename:

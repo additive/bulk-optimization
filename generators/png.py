@@ -9,16 +9,17 @@ from generators.generator import Generator
 
 class PNG(Generator):
     async def run(self):
-        self.start("(PNG )Starting compression...")
+        self.start("Starting compression...")
 
         output = self.rename_extension(self.output_file, "png")
-        output.touch()  # create an empty file
+        if output.exists() and self.skip_existing:
+            self.warn("Already exists, skipping...")
+            return output
 
         with Image.open(self.input_file) as img:
-            img.thumbnail((1600, 900), Image.LANCZOS)
-            img.compression_quality = 85
-            img.type = "optimize"
-            img.save(str(output), "PNG")
+            img = img.convert("RGBA")
+            img.thumbnail((1920, 1080), Image.LANCZOS)
+            img.save(str(output), "PNG", compress_level=6, optimize=True)
             img.close()
 
         self.done()

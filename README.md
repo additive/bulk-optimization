@@ -9,9 +9,9 @@ should help companies produces web save content without the pain.
 - [Usage](#usage)
 - [What happens?](#what-happens)
   - [Video files](#video-files)
-  - [Images... TODO](#images-todo)
-  - [GIF... TODO](#gif-todo)
-  - [Other files... TODO](#other-files-todo)
+  - [Images](#images)
+  - [GIF](#gif)
+  - [Other files](#other-files)
 - [Development](#development)
 - [Next](#next)
 - [Reads](#reads)
@@ -19,56 +19,92 @@ should help companies produces web save content without the pain.
 ## Usage
 
 ```
-Bulk Optimization
+usage: cli.py [-h] [-v] [--license] [--skip-existing [BOOL]] [--gif [BOOL]]
+              [--copy [BOOL]] [--image-formats LIST [LIST ...]]
+              [--video-formats LIST [LIST ...]] [--thumbnail [BOOL]]
+              [--vtt [BOOL]]
+              [input] [output]
 
-Iterate over a directory and perform compression, resizing and
-formatting for optimal web capabilities.
+Iterate over a directory and perform compression, resizing and formatting
+for optimal web capabilities.
 
-Options:
-    input_path      Where to start searching                (optional)
-    output_path     Where to copy the folder structure      (optional)
+positional arguments:
+  input                 folder to iterate over (default: current dir)
+  output                destination folder (default: `-Copy` added to input
+                        folder)
 
-Usage:
-    python3 main.py
-    python3 main.py /some/dir
-    python3 main.py /some/dir /goes/here
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+  --license             show program's license
+  --skip-existing [BOOL]
+                        skip existing processed files (default: True)
+  --gif [BOOL]          process GIF´s (default: False)
+  --copy [BOOL]         copy not processable files (default: False)
+  --image-formats LIST [LIST ...]
+                        image types to convert to (increases the execution
+                        time)
+  --video-formats LIST [LIST ...]
+                        video types to convert to (increases the execution
+                        time)
+  --thumbnail [BOOL]    create thumbnails from video files (default: False)
+  --vtt [BOOL]          create video progress thumbnails (default: False)
+
+A = required [A] = optional [A ...]  = optional list
 ```
 
 ## What happens?
 
 ### Video files
 
-Video files like `mov` or `mp4` will be converted and optimized. It will generate a few
-more files:
+Video files like `mov` or `mp4` will be converted and optimized. Depending on what option
+is set, those files will be generated:
 
-- MP4: the common file format for the web
-- WEBM: web format to reduce file size by keeping video quality (needs better finetuning)
-- Thumb: a thumbnail from the first frame in the video
-- VTT:
+- MP4: `--video-formats mp4`
+- WEBM: `--video-formats webm`
+- Thumb: `--thumbnail`
+- VTT: `--vtt`
   - JPG: a sprite containing thumbnails from the video based on a value
   - VTT: a file where each sprite frame is listed so video players can make use of them
 
-### Images... TODO
+### Images
 
-### GIF... TODO
+All known images will be optimized. Depending on what option is set, those files will be
+generated:
 
-### Other files... TODO
+- PNG: `--image-format: png`
+- JPG: `--image-format: jpg`
+- webp: `--image-format: webp`
+
+> If you choose to optmize png and jpg, the script will look for PNG´s without a
+> transparent background and convert them to JPG for better optimization.
+
+### GIF
+
+Possibly reducing the file size of a GIF, doesn't need to be the case everytime. Use
+`--gifs` to enable this generator.
+
+### Other files
+
+If you choose `--copy` the generator will copy all unknown file formats to the output dir,
+so that at the end you have two directories that are likely the same but optimized.
 
 ## Development
 
 1. Create a virtual env with `virtualenv` and install all requirements
-2. Run `python3 main.py /some/dir/to/test/with/many/files`
+2. Run `python3 cli.py /some/dir/to/test/with/many/files`
 
 ## Next
 
 - [ ] Create single executable
-- [ ] Create UI?
-- [ ] Add options (the hole process for this should be replaced)
-  - [ ] Override option to not skip existing files
-  - [ ] No thumbnail generation
-  - [ ] No JPEG/PNG only Webp
-  - [ ] No mp4 only Webm
-  - [ ] Compression ratio
+- [ ] Create UI? (for people that are not familiar with the terminal)
+- [x] Add options (the hole process for this should be replaced)
+  - [x] Override option to not skip existing files
+  - [x] No thumbnail generation
+  - [x] No JPEG/PNG only Webp
+  - [x] No mp4 only Webm
+  - [x] Compression ratio
+- [ ] Set max height for VTT image and split it into multiple files
 
 ## Reads
 

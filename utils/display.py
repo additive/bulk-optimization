@@ -41,7 +41,7 @@ class Write:
 
     @staticmethod
     def warn(*message):
-        print(Box.new(fg.yellow, "INFO"), *message)
+        print(Box.new(fg.yellow, "WARN"), *message)
 
     @staticmethod
     def error(*message):
