@@ -32,7 +32,7 @@ class Thumbnail(Generator):
 
         ffmpeg.run(stream, overwrite_output=True)
 
-        generator = JPG(self.group, self.type, output, output, False)
+        generator = JPG(self.group, "jpg", output, output, False)
         output = await generator.run()
 
         self.done()

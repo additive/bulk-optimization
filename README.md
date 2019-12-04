@@ -16,6 +16,8 @@ should help companies produces web save content without the pain.
 - [Next](#next)
 - [Reads](#reads)
 
+![preview](assets/preview.gif)
+
 ## Usage
 
 ```
