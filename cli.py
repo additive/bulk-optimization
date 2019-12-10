@@ -50,6 +50,15 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--slugify",
+    type=parse_bool,
+    nargs="?",
+    const=True,
+    default=True,
+    metavar="BOOL",
+    help="slugify filenames (default: True)",
+)
+parser.add_argument(
     "--skip-existing",
     type=parse_bool,
     nargs="?",
@@ -129,5 +138,4 @@ Write.line()  # empty
 
 args.output.mkdir(parents=True, exist_ok=True)
 
-print(args)
 asyncio.run(loop_structure(args))  # start the loop

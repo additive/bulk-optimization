@@ -1,4 +1,5 @@
 from pathlib import Path
+from slugify import slugify
 
 from utils.common import convert_bytes, has_transparency
 from utils.display import Write, display_file_info
@@ -7,13 +8,14 @@ from generators import File, VTT, Thumbnail, MP4, WEBM, GIF, PNG, JPG, WEBP
 
 """
 args:
-skip_existing:  bool
-skip_gif:       bool
-no_copy:        bool
-image_formats:  list
-video_formats:  list
-no_thumbnail:   bool
-no_vtt:         bool
+    slugify:        bool
+    skip_existing:  bool
+    skip_gif:       bool
+    no_copy:        bool
+    image_formats:  list
+    video_formats:  list
+    no_thumbnail:   bool
+    no_vtt:         bool
 """
 
 
@@ -35,6 +37,12 @@ async def loop_structure(args):
 
         # Create output directory/path
         output_file = Path(str(input_file).replace(args.input.name, args.output.name))
+        # Slugify filename
+        if args.slugify:
+            output_file = Path(
+                output_file.parent,
+                slugify(input_file.stem, lowercase=False) + output_file.suffix,
+            )
 
         # Skip process if file exist already otherwise override it
         if args.skip_existing and output_file.exists():
@@ -210,5 +218,5 @@ async def loop_structure(args):
 
     Write.green("Done!")
     Write.line()
-    Write.text("Old size: {}".format(convert_bytes(old_combined_file_size)))
-    Write.text("New size: {}".format(convert_bytes(new_combined_file_size)))
+    Write.text("Original size: {}".format(convert_bytes(old_combined_file_size)))
+    Write.text("Compressed size: {}".format(convert_bytes(new_combined_file_size)))

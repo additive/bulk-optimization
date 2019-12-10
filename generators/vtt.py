@@ -59,11 +59,9 @@ class VTT(Generator):
                 filepath = self.extract_frame(
                     videoFileClip, i, outputPrefix, size, frameCount
                 )
-
                 now_time = pre_time + datetime.timedelta(seconds=interval)
                 self.save_vtt_part(filepath, pre_time, now_time)
                 pre_time = now_time
-
                 frameCount += 1
 
         self.info("Frames extracted.")
@@ -113,8 +111,7 @@ class VTT(Generator):
         return outputVTT
 
     def save_vtt_part(self, filepath, pre_time, now_time):
-        filepath = Path(filepath)
-        filename = self.rename_extension(filepath, "txt")
+        filename = self.rename_extension(Path(filepath), "txt")
         with open(filename, "w") as txt_file:
             line_pre_time = pre_time.strftime("%H:%M:%S.%f")[:-3] + "\n"
             line_now_time = now_time.strftime("%H:%M:%S.%f")[:-3]

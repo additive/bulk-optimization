@@ -56,7 +56,7 @@ class Generator:
         Write.done(group_label + type_label, "Compression/conversion successful!")
 
     def rename_extension(self, file_path, new_ext_name):
-        return Path(str(file_path).replace(file_path.suffix, "." + new_ext_name))
+        return file_path.with_suffix("." + new_ext_name)
 
     def rename_file(self, file_path, new_file_name):
         return Path(
