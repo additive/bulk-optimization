@@ -34,8 +34,9 @@ class Thumbnail(Generator):
             print(str(e.stderr, "utf-8"), file=sys.stderr)
             sys.exit(1)
 
-        generator = JPG(self.group_name, "jpg", output, output, False)
+        self.done()
+
+        generator = JPG(self.group_name, self.group_label, output, output, False)
         output = await generator.run()
 
-        self.done()
         return output
