@@ -199,12 +199,12 @@ async def loop_structure(args):
 
         # All other files
         elif args.copy:
-            input_group = "unknown"
+            input_group = "file"
             input_type = None
             display_file_info(input_group, input_type, input_file)
 
             # Unknown
-            input_type = None  # maybe use file extension here
+            input_type = input_file.suffix.replace(".", "")
             generator = File(
                 input_group, input_type, input_file, output_file, args.skip_existing
             )
