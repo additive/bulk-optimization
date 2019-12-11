@@ -18,6 +18,8 @@ args:
     no_vtt:         bool
 """
 
+__version__ = "1.1.0"
+
 
 async def loop_structure(args):
     input_length = len(list(args.input.glob("**/*")))
@@ -38,7 +40,7 @@ async def loop_structure(args):
         # Create output directory/path
         output_file = Path(str(input_file).replace(args.input.name, args.output.name))
         # Slugify filename
-        if args.slugify:
+        if args.slugify and input_file.is_file():
             output_file = Path(
                 output_file.parent,
                 slugify(input_file.stem, lowercase=False) + output_file.suffix,
@@ -62,7 +64,7 @@ async def loop_structure(args):
         old_combined_file_size += input_file.stat().st_size
 
         # VIDEOS
-        if input_file.suffix in [".mp4", ".wmv", ".webm", ".mov", ".vlf"]:
+        if input_file.suffix in [".mp4", ".wmv", ".webm", ".mov", ".vlf", ".mkv"]:
             input_group = "video"
             input_type = None
             display_file_info(input_group, input_type, input_file)

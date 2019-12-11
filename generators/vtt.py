@@ -8,11 +8,13 @@ import math
 import tempfile
 import datetime
 
+from sty import fg
 from moviepy.editor import VideoFileClip
 from PIL import Image
-from click import progressbar
 from pathlib import Path
 
+from utils.display import Box
+from utils.progress import show_progress
 from generators.generator import Generator
 
 
@@ -52,7 +54,10 @@ class VTT(Generator):
 
         frameCount = 0
 
-        with progressbar(range(0, int(videoFileClip.duration), interval)) as items:
+        items = range(0, int(videoFileClip.duration), interval)
+        prefix = Box.new(fg.blue, "INFO") + " " + self.group_label + self.type_label
+        total_duration = int(videoFileClip.duration / interval)
+        with show_progress(total_duration, prefix) as bar:
             pre_time = datetime.datetime(1, 1, 1, 0, 0, 0)
             datetime.time(0, 0, 0, 0)
             for i in items:
@@ -63,6 +68,8 @@ class VTT(Generator):
                 self.save_vtt_part(filepath, pre_time, now_time)
                 pre_time = now_time
                 frameCount += 1
+                bar.update()
+            bar.close()
 
         self.info("Frames extracted.")
 

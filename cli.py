@@ -6,12 +6,11 @@ import asyncio
 
 from pathlib import Path
 
-from main import loop_structure
+from main import loop_structure, __version__
 from utils.input import parse_bool
 from utils.common import yes_no
 from utils.display import Write
 
-__version__ = "1.0.0"
 root = Path(__file__).resolve().parent
 license = Path(root / "LICENSE").read_text()
 desc = """
@@ -19,6 +18,13 @@ Iterate over a directory and perform compression, resizing and formatting
 for optimal web capabilities.
 """
 epilog = """
+examples:
+
+python3 cli.py --skip-existing false --copy true --image-formats webp ./videos
+python3 cli.py --skip-existing false --video-formats webm ./videos
+python3 cli.py --thumbnail --vtt --video-formats mp4 webm ./videos
+python3 cli.py --video-formats mp4 webm ./videos ./go/here
+
 A = required [A] = optional [A ...]  = optional list
 """
 

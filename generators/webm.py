@@ -5,7 +5,10 @@ Convert a video file to web save MP4
 import sys
 import ffmpeg
 
-from utils.progress import show_progress
+from sty import fg
+
+from utils.display import Box
+from utils.progress import show_progress_socket
 from generators.generator import Generator
 
 
@@ -18,20 +21,28 @@ class WEBM(Generator):
             self.warn("Already exists, skipping...")
             return output
 
+        prefix = Box.new(fg.blue, "INFO") + " " + self.group_label + self.type_label
         total_duration = float(ffmpeg.probe(self.input_file)["format"]["duration"])
-        with show_progress(total_duration) as socket_filename:
+        with show_progress_socket(total_duration, prefix) as socket_filename:
             try:
+                pipeline = ffmpeg.input(self.input_file)
+                audio = pipeline.audio
+                video = pipeline.video.filter("fps", fps=29, round="up").filter(
+                    "scale", "min(iw,1920)", "-2"
+                )
                 (
-                    ffmpeg.input(self.input_file)
-                    .filter("fps", fps=29, round="up")
-                    .filter("scale", "min(iw,1920)", "-2")
-                    .output(
+                    ffmpeg.output(
+                        video,
+                        audio,
                         filename=output,
-                        crf=20,
+                        crf=24,
+                        vcodec="libvpx",
+                        acodec="libvorbis",
                         preset="slower",
                         movflags="faststart",
                         pix_fmt="yuv420p",
-                        **{"b:v": "1M", "c:v": "libvpx", "c:a": "libvorbis"}
+                        loglevel="panic",
+                        **{"b:v": "1M", "qscale": "3"}
                     )
                     .global_args("-progress", "unix://{}".format(socket_filename))
                     .overwrite_output()

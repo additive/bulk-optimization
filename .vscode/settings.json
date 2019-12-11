@@ -32,6 +32,9 @@
   "cSpell.words": [
     "asyncio",
     "ffmpeg",
+    "gevent",
+    "moviepy",
+    "tqdm",
     "virtualenv",
     "webm"
   ],

@@ -9,51 +9,39 @@ from utils.display import Write, Box
 
 
 class Generator:
-    group = "generator"
-    type = None
+    group_name = "generator"
+    group_type = None
+    group_label = None
+    type_label = None
+
     input_file = None
     output_file = None
     skip_existing = True
 
-    def __init__(self, group, type, input_file, output_file, skip_existing):
-        self.group = group
-        self.type = type
+    def __init__(self, group_name, group_type, input_file, output_file, skip_existing):
+        self.group_name = group_name
+        self.group_type = group_type
+        self.group_label = Box.new(fg.li_black, group_name)
+        self.type_label = " " + Box.new(fg.li_black, group_type) if group_type else ""
+
         self.input_file = Path(input_file)
         self.output_file = Path(output_file)
         self.skip_existing = skip_existing
 
     def start(self, *text):
-        group_label = Box.new(fg.li_black, self.group)
-        type_label = " " + Box.new(fg.li_black, self.type) if self.type else ""
-        Write.next(
-            group_label + type_label, *text,
-        )
+        Write.next(self.group_label + self.type_label, *text)
 
     def info(self, *text):
-        group_label = Box.new(fg.li_black, self.group)
-        type_label = " " + Box.new(fg.li_black, self.type) if self.type else ""
-        Write.info(
-            group_label + type_label, *text,
-        )
+        Write.info(self.group_label + self.type_label, *text)
 
     def error(self, *text):
-        group_label = Box.new(fg.li_black, self.group)
-        type_label = " " + Box.new(fg.li_black, self.type) if self.type else ""
-        Write.error(
-            group_label + type_label, *text,
-        )
+        Write.error(self.group_label + self.type_label, *text)
 
     def warn(self, *text):
-        group_label = Box.new(fg.li_black, self.group)
-        type_label = " " + Box.new(fg.li_black, self.type) if self.type else ""
-        Write.warn(
-            group_label + type_label, *text,
-        )
+        Write.warn(self.group_label + self.type_label, *text)
 
     def done(self):
-        group_label = Box.new(fg.li_black, self.group)
-        type_label = " " + Box.new(fg.li_black, self.type) if self.type else ""
-        Write.done(group_label + type_label, "Compression/conversion successful!")
+        Write.done(self.group_label + self.type_label, "Task successful!")
 
     def rename_extension(self, file_path, new_ext_name):
         return file_path.with_suffix("." + new_ext_name)

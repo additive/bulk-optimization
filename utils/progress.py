@@ -73,11 +73,22 @@ def _watch_progress(handler):
                 raise
 
 
+bar_format = (
+    "{desc} {percentage:3.0f}% [{bar}] {n_fmt}/{total_fmt} [{elapsed}~{remaining}]"
+)
+
+
 @contextlib.contextmanager
-def show_progress(total_duration):
+def show_progress_socket(total_duration, desc="Progress"):
     """Create a unix-domain socket to watch progress and render tqdm
     progress bar."""
-    with tqdm(total=round(total_duration, 2)) as bar:
+    with tqdm(
+        desc=desc,
+        total=round(total_duration, 2),
+        bar_format=bar_format,
+        dynamic_ncols=True,
+        ascii=True,
+    ) as bar:
 
         def handler(key, value):
             if key == "out_time_ms":
@@ -88,3 +99,15 @@ def show_progress(total_duration):
 
         with _watch_progress(handler) as socket_filename:
             yield socket_filename
+
+
+@contextlib.contextmanager
+def show_progress(total_duration, desc="Progress"):
+    bar = tqdm(
+        desc=desc,
+        total=round(total_duration, 2),
+        bar_format=bar_format,
+        dynamic_ncols=True,
+        ascii=True,
+    )
+    yield bar

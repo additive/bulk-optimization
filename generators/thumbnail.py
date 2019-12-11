@@ -2,6 +2,7 @@
 Generates a compressed thumbnail for a video
 """
 
+import sys
 import ffmpeg
 
 from generators.generator import Generator
@@ -18,21 +19,22 @@ class Thumbnail(Generator):
             self.warn("Already exists, skipping...")
             return output
 
-        instance = ffmpeg.input(self.input_file)
-        video = instance.video
+        try:
+            (
+                ffmpeg.input(self.input_file)
+                .output(
+                    filename=output,
+                    vframes=1,
+                    **{"hide_banner": None, "stats": None, "loglevel": "quiet"}
+                )
+                .overwrite_output()
+                .run(capture_stdout=True, capture_stderr=True)
+            )
+        except ffmpeg.Error as e:
+            print(str(e.stderr, "utf-8"), file=sys.stderr)
+            sys.exit(1)
 
-        video = video.filter("scale", "min(iw,1920)", "-2")
-
-        stream = ffmpeg.output(
-            video,
-            filename=output,
-            vframes=1,
-            **{"hide_banner": None, "stats": None, "loglevel": "panic"}
-        )
-
-        ffmpeg.run(stream, overwrite_output=True)
-
-        generator = JPG(self.group, "jpg", output, output, False)
+        generator = JPG(self.group_name, "jpg", output, output, False)
         output = await generator.run()
 
         self.done()

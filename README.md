@@ -20,9 +20,12 @@ should help companies produces web save content without the pain.
 
 ## Usage
 
+> Use `python3 cli.py --help` to view the below
+
 ```
-usage: cli.py [-h] [-v] [--license] [--skip-existing [BOOL]] [--gif [BOOL]]
-              [--copy [BOOL]] [--image-formats LIST [LIST ...]]
+usage: cli.py [-h] [-v] [--license] [--slugify [BOOL]]
+              [--skip-existing [BOOL]] [--gif [BOOL]] [--copy [BOOL]]
+              [--image-formats LIST [LIST ...]]
               [--video-formats LIST [LIST ...]] [--thumbnail [BOOL]]
               [--vtt [BOOL]]
               [input] [output]
@@ -32,13 +35,14 @@ for optimal web capabilities.
 
 positional arguments:
   input                 folder to iterate over (default: current dir)
-  output                destination folder (default: `-Copy` added to input
+  output                destination folder (default: `-copy` added to input
                         folder)
 
 optional arguments:
   -h, --help            show this help message and exit
   -v, --version         show program's version number and exit
   --license             show program's license
+  --slugify [BOOL]      slugify filenames (default: True)
   --skip-existing [BOOL]
                         skip existing processed files (default: True)
   --gif [BOOL]          process GIF´s (default: False)
@@ -51,6 +55,13 @@ optional arguments:
                         time)
   --thumbnail [BOOL]    create thumbnails from video files (default: False)
   --vtt [BOOL]          create video progress thumbnails (default: False)
+
+examples:
+
+python3 cli.py --skip-existing false --copy true --image-formats webp ./videos
+python3 cli.py --skip-existing false --video-formats webm ./videos
+python3 cli.py --thumbnail --vtt --video-formats mp4 webm ./videos
+python3 cli.py --video-formats mp4 webm ./videos ./go/here
 
 A = required [A] = optional [A ...]  = optional list
 ```
