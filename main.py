@@ -1,3 +1,5 @@
+import time
+
 from pathlib import Path
 from slugify import slugify
 
@@ -20,14 +22,22 @@ args:
 
 __version__ = "1.1.0"
 
+defaults = {"mp4": {"video_codec": "h264", "audio_codec": "aac"}}
+
 
 async def loop_structure(args):
-    input_length = len(list(args.input.glob("**/*")))
+    if type(args) is not dict:
+        raise ValueError("Arguments must be of type dict!")
+
+    args.update(defaults)
+
+    input_length = len(list(args["input"].glob("**/*")))
     old_combined_file_size = 0
     new_combined_file_size = 0
+    start_time = time.time()
 
-    # Loop everything you can find in `args.input`
-    for index, input_file in enumerate(args.input.glob("**/*")):
+    # Loop every file/folder
+    for index, input_file in enumerate(args["input"].glob("**/*")):
         Write.yellow("Processing file {} of {}".format(index + 1, input_length))
         Write.gray(">>> ", input_file)
 
@@ -38,16 +48,19 @@ async def loop_structure(args):
             continue
 
         # Create output directory/path
-        output_file = Path(str(input_file).replace(args.input.name, args.output.name))
+        output_file = Path(
+            str(input_file).replace(str(args["input"]), str(args["output"]))
+        )
+
         # Slugify filename
-        if args.slugify and input_file.is_file():
+        if args["slugify"] and input_file.is_file():
             output_file = Path(
                 output_file.parent,
-                slugify(input_file.stem, lowercase=False) + output_file.suffix,
+                slugify(input_file.stem, lowercase=False) + input_file.suffix,
             )
 
         # Skip process if file exist already otherwise override it
-        if args.skip_existing and output_file.exists():
+        if args["skip_existing"] and output_file.exists():
             Write.blue("Skipping existing")
             Write.line()
             continue
@@ -59,7 +72,7 @@ async def loop_structure(args):
             Write.line()
             continue
 
-        Write.gray("<<< ", str(output_file).replace(output_file.suffix, "…"))
+        Write.gray("<<< ", str(output_file).replace(output_file.suffix, "..."))
 
         old_combined_file_size += input_file.stat().st_size
 
@@ -71,9 +84,14 @@ async def loop_structure(args):
 
             # MP4
             input_type = "mp4"
-            if input_type in args.video_formats:
+            if input_type in args["video_formats"]:
                 generator = MP4(
-                    input_group, input_type, input_file, output_file, args.skip_existing
+                    input_group,
+                    input_type,
+                    input_file,
+                    output_file,
+                    args["skip_existing"],
+                    args["mp4"],
                 )
                 output = await generator.run()
                 display_file_info(input_group, input_type, output)
@@ -81,29 +99,41 @@ async def loop_structure(args):
 
             # WEBM
             input_type = "webm"
-            if input_type in args.video_formats:
+            if input_type in args["video_formats"]:
                 generator = WEBM(
-                    input_group, input_type, input_file, output_file, args.skip_existing
+                    input_group,
+                    input_type,
+                    input_file,
+                    output_file,
+                    args["skip_existing"],
                 )
                 output = await generator.run()
                 display_file_info(input_group, input_type, output)
-                if "mp4" not in args.video_formats:
+                if "mp4" not in args["video_formats"]:
                     new_combined_file_size += output.stat().st_size
 
             # VTT
             input_type = "vtt"
-            if args.vtt:
+            if args["vtt"]:
                 generator = VTT(
-                    input_group, input_type, input_file, output_file, args.skip_existing
+                    input_group,
+                    input_type,
+                    input_file,
+                    output_file,
+                    args["skip_existing"],
                 )
                 output = await generator.run()
                 display_file_info(input_group, input_type, output)
 
             # Thumbnail
             input_type = "thumb"
-            if args.thumbnail:
+            if args["thumbnail"]:
                 generator = Thumbnail(
-                    input_group, input_type, input_file, output_file, args.skip_existing
+                    input_group,
+                    input_type,
+                    input_file,
+                    output_file,
+                    args["skip_existing"],
                 )
                 output = await generator.run()
                 display_file_info(input_group, input_type, output)
@@ -114,7 +144,7 @@ async def loop_structure(args):
             input_type = None
             display_file_info(input_type, input_type, input_file)
 
-            if ["jpg", "png"] == sorted(args.image_formats):
+            if ["jpg", "png"] == sorted(args["image_formats"]):
                 if has_transparency(input_file):
                     # PNG
                     input_type = "png"
@@ -123,7 +153,7 @@ async def loop_structure(args):
                         input_type,
                         input_file,
                         output_file,
-                        args.skip_existing,
+                        args["skip_existing"],
                     )
                     output = await generator.run()
                     display_file_info(input_group, input_type, output)
@@ -135,55 +165,59 @@ async def loop_structure(args):
                         input_type,
                         input_file,
                         output_file,
-                        args.skip_existing,
+                        args["skip_existing"],
                     )
                     output = await generator.run()
                     display_file_info(input_group, input_type, output)
-                    if "webp" not in args.image_formats:
+                    if "webp" not in args["image_formats"]:
                         new_combined_file_size += output.stat().st_size
             else:
                 # PNG
                 input_type = "png"
-                if input_type in args.image_formats:
+                if input_type in args["image_formats"]:
                     generator = PNG(
                         input_group,
                         input_type,
                         input_file,
                         output_file,
-                        args.skip_existing,
+                        args["skip_existing"],
                     )
                     output = await generator.run()
                     display_file_info(input_group, input_type, output)
-                    if not any(f in ["jpg", "webp"] for f in args.image_formats):
+                    if not any(f in ["jpg", "webp"] for f in args["image_formats"]):
                         new_combined_file_size += output.stat().st_size
                 # JPG
                 input_type = "jpg"
-                if input_type in args.image_formats:
+                if input_type in args["image_formats"]:
                     generator = JPG(
                         input_group,
                         input_type,
                         input_file,
                         output_file,
-                        args.skip_existing,
+                        args["skip_existing"],
                     )
                     output = await generator.run()
                     display_file_info(input_group, input_type, output)
-                    if not any(f in ["png", "webp"] for f in args.image_formats):
+                    if not any(f in ["png", "webp"] for f in args["image_formats"]):
                         new_combined_file_size += output.stat().st_size
 
             # WEBP
             input_type = "webp"
-            if input_type in args.image_formats:
+            if input_type in args["image_formats"]:
                 generator = WEBP(
-                    input_group, input_type, input_file, output_file, args.skip_existing
+                    input_group,
+                    input_type,
+                    input_file,
+                    output_file,
+                    args["skip_existing"],
                 )
                 output = await generator.run()
                 display_file_info(input_group, input_type, output)
-                if not all(f in ["jpg", "png"] for f in args.image_formats):
+                if not all(f in ["jpg", "png"] for f in args["image_formats"]):
                     new_combined_file_size += output.stat().st_size
 
         # GIF
-        elif input_file.suffix == ".gif" and args.gif:
+        elif input_file.suffix == ".gif" and args["gif"]:
             input_group = "gif"
             input_type = None
             display_file_info(input_type, input_type, input_file)
@@ -191,14 +225,14 @@ async def loop_structure(args):
             # GIF
             input_type = "gif"
             generator = GIF(
-                input_group, input_type, input_file, output_file, args.skip_existing
+                input_group, input_type, input_file, output_file, args["skip_existing"]
             )
             output = await generator.run()
             display_file_info(input_group, input_type, output)
             new_combined_file_size += output.stat().st_size
 
         # All other files
-        elif args.copy:
+        elif args["copy"]:
             input_group = "file"
             input_type = None
             display_file_info(input_group, input_type, input_file)
@@ -206,7 +240,7 @@ async def loop_structure(args):
             # Unknown
             input_type = input_file.suffix.replace(".", "")
             generator = File(
-                input_group, input_type, input_file, output_file, args.skip_existing
+                input_group, input_type, input_file, output_file, args["skip_existing"]
             )
             output = await generator.run()
             display_file_info(input_group, input_type, output)
@@ -218,7 +252,13 @@ async def loop_structure(args):
 
         Write.text()  # empty
 
-    Write.green("Done!")
+    elapsed_time = time.time() - start_time
+    elapsed_time = round(elapsed_time // 60)
+    if elapsed_time > 1:
+        Write.green("Done after " + str(elapsed_time) + " minutes")
+    else:
+        Write.green("Done after some seconds")
+
     Write.line()
     Write.text("Original size: {}".format(convert_bytes(old_combined_file_size)))
     Write.text("Compressed size: {}".format(convert_bytes(new_combined_file_size)))

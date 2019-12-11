@@ -1,0 +1,12 @@
+input="tests/struct"
+# output="tests/struct2"
+
+skip_existing=false
+slugify=false
+
+gif=false
+copy=false
+thumbnail=false
+vtt=false
+image_formats=[]
+video_formats=["mp4"]

@@ -18,7 +18,17 @@ class Generator:
     output_file = None
     skip_existing = True
 
-    def __init__(self, group_name, group_type, input_file, output_file, skip_existing):
+    options = dict()
+
+    def __init__(
+        self,
+        group_name,
+        group_type,
+        input_file,
+        output_file,
+        skip_existing,
+        options=dict(),
+    ):
         self.group_name = group_name
         self.group_type = group_type
         self.group_label = Box.new(fg.li_black, group_name)
@@ -27,6 +37,8 @@ class Generator:
         self.input_file = Path(input_file)
         self.output_file = Path(output_file)
         self.skip_existing = skip_existing
+
+        self.options = options
 
     def start(self, *text):
         Write.next(self.group_label + self.type_label, *text)

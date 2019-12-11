@@ -7,6 +7,7 @@ import asyncio
 from pathlib import Path
 
 from main import loop_structure, __version__
+from config import load_config, parse_config
 from utils.input import parse_bool
 from utils.common import yes_no
 from utils.display import Write
@@ -53,6 +54,14 @@ parser.add_argument(
     nargs="?",
     default=None,
     help="destination folder (default: `-copy` added to input folder)",
+)
+
+parser.add_argument(
+    "--config",
+    type=Path,
+    nargs="?",
+    metavar="PATH",
+    help="a path to a config .toml file",
 )
 
 parser.add_argument(
@@ -129,19 +138,32 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
+args = vars(args)
 
-if not args.output:
-    args.output = Path(str(args.input) + "-copy")
+if args["config"]:
+    args["config"] = Path(args["config"])
+    if args["config"].exists() and args["config"].is_file():
+        config = load_config(args["config"])
+        config = parse_config(config)
+        args.update(config)
+    else:
+        raise ValueError("Cannot find config file: " + str(args["config"]))
 
-Write.text("Input: {}".format(args.input))
-Write.text("Output: {}".format(args.output))
+if not args["output"]:
+    args["output"] = Path(str(args["input"]) + "-copy")
+args["output"].mkdir(parents=True, exist_ok=True)
+
+Write.text("Input: {}".format(args["input"]))
+Write.text("Output: {}".format(args["output"]))
+# TODO: add file count based on above generator options
+# TODO: add estimated time based on above generator options * delta
+
+
 proceed = yes_no("Continue?")
 if not proceed:
     exit(0)
 Write.line()  # empty
 Write.green("Starting...")
 Write.line()  # empty
-
-args.output.mkdir(parents=True, exist_ok=True)
 
 asyncio.run(loop_structure(args))  # start the loop
